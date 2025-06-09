@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import './About.css';
-import Contact from './Contact';
+
 
 const About = () => {
   useEffect(() => {
@@ -32,65 +32,71 @@ const About = () => {
 
   return (
     <>
-      <section className="about-section">
-        <div className='about'>
-          <div className='feature-text'>
-            <h2>About</h2>
-          </div>
-        </div>
+      <>
+  <section className="about-section">
+    <div className='about'>
+      <div className='feature-text'>
+        <h2>About</h2>
+      </div>
+    </div>
 
-        <div className="feature-block">
-          <div className="feature-text">
-            <h2>Lorem ipsum dolor sit amet consectetur</h2>
-            <p>At PatrolNet, we believe that safer neighborhoods begin with better communication and smarter patrol strategies. Our system optimizes tanod deployment based on patrol patterns, community input, and live incident data—ensuring that resources are used effectively and response times are minimized. Through a user-friendly interface, residents can report incidents directly, while tanods receive timely updates and guidance to act swiftly and efficiently.</p>
-          </div>
-          <div className="feature-image">
-            <div className="image-container">
-              <img src="A1.jpg" alt="AI Detection" />
-              <div className="image-overlay">
-                <h3>Innovation</h3>
-                <p></p>
-              </div>
-            </div>
+    <div className="feature-block">
+      <div className="feature-text">
+        <h2>Instant Incident Reporting for Safer Communities</h2>
+        <p>
+          PatrolNet is a powerful web and mobile application designed to enhance community safety by enabling residents to instantly report accidents and incidents directly to their barangay. With just a few taps, vital information reaches local authorities, allowing them to respond quickly and effectively. This real-time communication ensures that no incident goes unnoticed, improving response times and strengthening neighborhood vigilance.
+        </p>
+      </div>
+      <div className="feature-image">
+        <div className="image-container">
+          <img src="Alert.png" alt="Instant Notification" />
+          <div className="image-overlay">
+            <h3>Innovation</h3>
+            <p>Real-time alerts</p>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div className="feature-block reverse">
-          <div className="feature-text">
-            <h2>Lorem ipsum dolor sit amet consectetur</h2>
-            <p>Developed with the unique needs of barangays in mind, PatrolNet bridges the gap between community vigilance and modern technology, fostering a more connected, proactive, and secure environment for all.</p>
-          </div>
-          <div className="feature-image">
-            <div className="image-container">
-              <img src="A1.jpg" alt="Rapid Analysis" />
-              <div className="image-overlay">
-                <h3>Precision</h3>
-                <p>Detailed analytics</p>
-              </div>
-            </div>
+    <div className="feature-block reverse">
+      <div className="feature-text">
+        <h2>Designed for Barangays, Powered by Technology</h2>
+        <p>
+          Built with the specific needs of barangays in mind, PatrolNet bridges the gap between grassroots community efforts and modern digital tools. The app empowers residents to be active participants in public safety while giving barangay officials the data they need to make informed decisions and coordinate effective responses.
+        </p>
+      </div>
+      <div className="feature-image">
+        <div className="image-container">
+          <img src="Alert2.jpg" alt="Community Focused" />
+          <div className="image-overlay">
+            <h3>Precision</h3>
+            <p>Localized solutions</p>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div className="feature-block">
-          <div className="feature-text">
-            <h2>Lorem ipsum dolor sit amet consectetur</h2>
-            <p>
-Developed with the unique needs of barangays in mind, PatrolNet bridges the gap between community vigilance and modern technology, fostering a more connected, proactive, and secure environment for all.</p>
-          </div>
-          <div className="feature-image">
-            <div className="image-container">
-              <img src="A1.jpg" alt="Production Team" />
-              <div className="image-overlay">
-                <h3>Expertise</h3>
-                <p>Professional team</p>
-              </div>
-            </div>
+    <div className="feature-block">
+      <div className="feature-text">
+        <h2>Empowering Action Through Information</h2>
+        <p>
+          PatrolNet ensures that every report submitted by residents is quickly relayed to the appropriate barangay personnel. Through a user-friendly interface and automated alerts, the platform streamlines incident handling, increases awareness, and encourages a culture of community cooperation and proactive safety.
+        </p>
+      </div>
+      <div className="feature-image">
+        <div className="image-container">
+          <img src="Alert3.jpg" alt="Team at Work" />
+          <div className="image-overlay">
+            <h3>Expertise</h3>
+            <p>Community-driven design</p>
           </div>
         </div>
-      </section>
-      
-      {/* Contact Section */}
-      <Contact />
+      </div>
+    </div>
+  </section>
+</>
+
+     
     </>
   );
 };

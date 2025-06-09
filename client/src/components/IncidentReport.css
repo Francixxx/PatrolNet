@@ -525,20 +525,42 @@
 
 /* Modal styling updates */
 .modal-container {
-  background-color: white;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background: #fff;
+  width: 450px;
+  max-height: 90vh; /* Limit modal height */
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column; /* Enable flex layout */
 }
 
 .modal-header {
+  background: #b22222;
+  color: #fff;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+.modal-body {
+  padding: 20px;
+  background-color: #f9f9f9;
+  overflow-y: auto; /* Enable vertical scrolling */
+  flex: 1; /* Take remaining space */
+  max-height: calc(90vh - 120px); /* Account for header and footer */
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  background: #f1f1f1;
+  flex-shrink: 0; /* Prevent footer from shrinking */
 }
 
 .modal-header h2 {

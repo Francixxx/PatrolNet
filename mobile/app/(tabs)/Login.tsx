@@ -37,7 +37,7 @@ const Login: React.FC = () => {
 
     setLoading(true);
     try {
-        const response = await axios.post("http://192.168.125.28:3001/login", {
+        const response = await axios.post("http://192.168.1.149:3001/login", {
           username,
           password,
           clientType: 'mobile' // Specify this is a mobile client request
