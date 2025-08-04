@@ -17,7 +17,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.mobile"
+      "package": "App.Barangay.Incident_Report"
     },
     "web": {
       "bundler": "metro",

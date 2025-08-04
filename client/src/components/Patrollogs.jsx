@@ -17,7 +17,7 @@ const PatrolLogs = () => {
   const itemsPerPage = 10;
 
   // Base URL for your backend
-  const BASE_URL = 'http://192.168.1.149:3001';
+  const BASE_URL = 'http://192.168.100.3:3001';
   // 1. Add new state for patrol activities data
     const [patrolActivitiesData, setPatrolActivitiesData] = useState([]);
   // Function to truncate location text

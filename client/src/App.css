@@ -92,3 +92,6 @@ body, html, #root {
 .overlay p {
   font-size: 1.2rem;
 }
+.logo{
+  border-radius: 50px;
+}
