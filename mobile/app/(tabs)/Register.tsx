@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  Image,
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
@@ -89,7 +90,7 @@ const Register: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://192.168.1.149:3001/register", {
+      const response = await axios.post("http://192.168.100.3:3001/register", {
         username,
         password,
         role,
@@ -120,20 +121,16 @@ return (
   <ScrollView contentContainerStyle={styles.scrollContainer}>
     <View style={styles.container}>
       <View style={styles.box}>
-        {/* Header Section */}
-        <View style={styles.headerSection}>
-          <View style={styles.logoCircle}>
-            <View style={styles.logoInner}>
-              <Text style={styles.logoText}>PN</Text>
-              <View style={styles.logoAccent} />
-            </View>
-            <View style={styles.logoGlow} />
-          </View>
-          <Text style={styles.appTitle}>PatrolNet</Text>
-          <Text style={styles.appSubtitle}>Emergency Response System</Text>
-          <Text style={styles.welcomeText}>Account Registration</Text>
-          <Text style={styles.instructionText}>Complete your profile to join the network</Text>
-        </View>
+<View style={styles.headerSection}>
+  <Image
+      source={require('./logo.jpg')}
+    style={styles.logoImage}
+    resizeMode="contain"
+  />
+  <Text style={styles.appTitle}>PatrolNet</Text>
+  <Text style={styles.appSubtitle}>Emergency Response System</Text>
+  <Text style={styles.welcomeText}>Mobile Access - Tanod & Residents</Text>
+</View>
 
         {/* Form Section */}
         <View style={styles.formContainer}>
@@ -590,6 +587,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 16,
   },
+  logoImage: {
+  width: 100,
+  height: 100,
+  borderRadius: 50, // Makes it circular if your logo is square
+  marginBottom: 24,
+  backgroundColor: "#3B82F6", // Optional fallback
+},
 });
 
 export default Register;

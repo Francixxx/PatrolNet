@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
   const fetchUserData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://192.168.1.149:3001/api/user/${username}`);
+      const response = await axios.get(`http://192.168.100.3:3001/api/user/${username}`);
       
       if (response.data) {
         setUserData(response.data);
@@ -69,7 +69,7 @@ const Profile: React.FC = () => {
         setFormName(response.data.NAME || "");
         setFormEmail(response.data.EMAIL || "");
         setFormAddress(response.data.ADDRESS || "");
-        setImage(response.data.IMAGE ? `http://192.168.1.149:3001/uploads/${response.data.IMAGE}` : null);
+        setImage(response.data.IMAGE ? `http://192.168.100.3:3001/uploads/${response.data.IMAGE}` : null);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -122,7 +122,7 @@ const Profile: React.FC = () => {
       
       // Update user
       const response = await axios.put(
-        `http://192.168.1.149:3001/api/users/${userData?.ID}`,
+        `http://192.168.100.3:3001/api/users/${userData?.ID}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -369,6 +369,8 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     color: "#555",
+    fontSize: 14,
+    fontStyle: "italic",
   },
   profileHeader: {
     flexDirection: "row",
@@ -376,15 +378,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 60,
-    backgroundColor: "#555",
+    backgroundColor: "#333",
     paddingBottom: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   backButton: {
     padding: 8,
   },
   headerTitle: {
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 20,
     color: "#fff",
   },
   editButton: {
@@ -396,7 +405,7 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 30,
     alignItems: "center",
   },
   imageContainer: {
@@ -408,23 +417,23 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: "#d9d9d9",
+    borderColor: "#ccc",
   },
   imagePlaceholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#eee",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
-    borderColor: "#d9d9d9",
+    borderColor: "#ccc",
   },
   cameraIconContainer: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#555",
+    backgroundColor: "#333",
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -435,23 +444,30 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     width: "100%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 40,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   infoItem: {
     flexDirection: "row",
-    marginBottom: 15,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    marginBottom: 12,
   },
   infoLabel: {
     fontWeight: "bold",
     width: "35%",
     fontSize: 14,
-    color: "#555",
+    color: "#444",
   },
   infoValue: {
     flex: 1,
     fontSize: 14,
+    color: "#222",
   },
   inputGroup: {
     width: "100%",
@@ -466,25 +482,25 @@ const styles = StyleSheet.create({
   inputField: {
     width: "100%",
     height: 45,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
+    backgroundColor: "#f1f1f1",
+    borderRadius: 8,
     paddingHorizontal: 15,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#ddd",
   },
   saveButton: {
     width: "100%",
     height: 45,
-    backgroundColor: "#555",
+    backgroundColor: "#333",
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
-    marginBottom: 40,
   },
   saveButtonText: {
     fontWeight: "bold",
     color: "#fff",
+    fontSize: 16,
   },
 });
 

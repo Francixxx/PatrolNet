@@ -7,11 +7,14 @@ import {
   ActivityIndicator,
   StyleSheet,
   Alert,
+  Image,
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from "react-native";
+
 
 type RootStackParamList = {
   Login: undefined;
@@ -37,7 +40,7 @@ const Login: React.FC = () => {
 
     setLoading(true);
     try {
-        const response = await axios.post("http://192.168.1.149:3001/login", {
+        const response = await axios.post("http://192.168.100.3:3001/login", {
           username,
           password,
           clientType: 'mobile' // Specify this is a mobile client request
@@ -77,30 +80,36 @@ const Login: React.FC = () => {
             });
 
             // Role-based navigation
-            if (userData.role === 'Resident') {
-              // Redirect Residents to IncidentReport
-              navigation.navigate("IncidentReport", { username });
-            } else if (userData.role === 'Tanod') {
-              // Redirect Tanod to Home
-              navigation.navigate("Home", { 
-                username, 
-                userData: userData 
-              });
-            }
+              if (userData.role === 'Resident') {
+                // Redirect Residents to Home instead of IncidentReport
+                navigation.navigate("Home", { 
+                  username, 
+                  userData: userData 
+                });
+              } else if (userData.role === 'Tanod') {
+                // Redirect Tanod to Home
+                navigation.navigate("Home", { 
+                  username, 
+                  userData: userData 
+                });
+              }
 
           } catch (storageError) {
             console.error('Error storing user data:', storageError);
             Alert.alert("Warning", "Login successful but failed to save user data locally.");
             
             // Still perform role-based navigation even if storage fails
-            if (userData.role === 'Resident') {
-              navigation.navigate("IncidentReport", { username });
-            } else if (userData.role === 'Tanod') {
-              navigation.navigate("Home", { 
-                username, 
-                userData: userData 
-              });
-            }
+                if (userData.role === 'Resident') {
+                  navigation.navigate("Home", { 
+                    username, 
+                    userData: userData 
+                  });
+                } else if (userData.role === 'Tanod') {
+                  navigation.navigate("Home", { 
+                    username, 
+                    userData: userData 
+                  });
+                }
           }
         }
       } catch (error: any) {
@@ -121,21 +130,19 @@ const Login: React.FC = () => {
   };
 
 return (
+  <SafeAreaView style={styles.safeContainer}>
   <View style={styles.loginContainer}>
     <View style={styles.loginBox}>
-      {/* Header Section */}
-      <View style={styles.headerSection}>
-        <View style={styles.logoCircle}>
-          <View style={styles.logoInner}>
-            <Text style={styles.logoText}>PN</Text>
-            <View style={styles.logoAccent} />
-          </View>
-          <View style={styles.logoGlow} />
-        </View>
-        <Text style={styles.appTitle}>PatrolNet</Text>
-        <Text style={styles.appSubtitle}>Emergency Response System</Text>
-        <Text style={styles.welcomeText}>Mobile Access - Tanod & Residents</Text>
-      </View>
+ <View style={styles.headerSection}>
+  <Image
+    source={require('./logo.jpg')}
+    style={styles.logoImage}
+    resizeMode="contain"
+  />
+  <Text style={styles.appTitle}>PatrolNet</Text>
+  <Text style={styles.appSubtitle}>Emergency Response System</Text>
+  <Text style={styles.welcomeText}>Mobile Access - Tanod & Residents</Text>
+</View>
 
       {/* Form Section */}
       <View style={styles.formContainer}>
@@ -207,23 +214,30 @@ return (
         </View>
       </View>
 
-      {/* Security Badge */}
+      {/* Security Badge 
       <View style={styles.securityBadge}>
         <Text style={styles.securityIcon}>📱</Text>
         <Text style={styles.securityText}>MOBILE SECURE ACCESS</Text>
       </View>
-
-      {/* Status Indicator */}
+*/}
+      {/* Status Indicator 
       <View style={styles.statusBar}>
         <View style={styles.statusDot} />
         <Text style={styles.statusText}>SYSTEM OPERATIONAL</Text>
-      </View>
+      </View>*/}
     </View>
   </View>
+  
+          </SafeAreaView>
 );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+  flex: 1,
+  backgroundColor: "#0F172A",
+},
+
   loginContainer: {
     flex: 1,
     backgroundColor: "#0F172A",
@@ -467,6 +481,13 @@ const styles = StyleSheet.create({
     color: "#22C55E",
     letterSpacing: 0.5,
   },
+  logoImage: {
+  width: 100,
+  height: 100,
+  borderRadius: 50, // Makes it circular if your logo is square
+  marginBottom: 24,
+  backgroundColor: "#3B82F6", // Optional fallback
+},
 });
 
 export default Login;

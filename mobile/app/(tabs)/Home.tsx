@@ -1,6 +1,6 @@
 // Home.tsx
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform,Image} from "react-native";
 import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import axios from "axios";
@@ -46,7 +46,7 @@ const Home: React.FC = () => {
   
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.149:3001/api/user/${username}`);
+      const response = await axios.get(`http://192.168.100.3:3001/api/user/${username}`);
       
       if (response.data) {
         setUserData(response.data);
@@ -95,19 +95,26 @@ const Home: React.FC = () => {
   
   return (
      <View style={styles.container}>
-    <NavBar username={username} userImage={userData?.IMAGE} />
+
+        <NavBar 
+      username={username} 
+      userImage={userData?.IMAGE} 
+      userRole={userData?.ROLE}  // Add this line
+        />
+
     <View style={styles.body}>
       <Text style={styles.greeting}>Welcome back, {username}</Text>
       <Text style={styles.subGreeting}>Your community safety network</Text>
       
-      <View style={styles.logoContainer}>
-        <View style={styles.logoCircle}>
-          <Text style={styles.logoText}>PN</Text>
-          <View style={styles.logoAccent} />
-        </View>
-        <Text style={styles.title}>PatrolNet</Text>
-        <Text style={styles.tagline}>Community Safety Network</Text>
-      </View>
+<View style={styles.logoContainer}>
+  <Image
+    source={require('./logo.jpg')} // <-- Replace with your logo path
+    style={styles.logoImage}
+    resizeMode="contain"
+  />
+  <Text style={styles.title}>PatrolNet</Text>
+  <Text style={styles.tagline}>Community Safety Network</Text>
+</View>
       
       <View style={styles.descriptionCard}>
         <Text style={styles.descriptionTitle}>About PatrolNet</Text>
@@ -197,6 +204,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 30,
   },
+  logoImage: {
+  width: 80,
+  height: 80,
+  borderRadius: 40, // Makes the image circular if it's square
+  marginBottom: 12,
+  backgroundColor: "#3B82F6", // Optional: fallback background
+},
   logoCircle: {
     width: 80,
     height: 80,
