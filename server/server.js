@@ -109,8 +109,8 @@ app.post("/login", (req, res) => {
     let clientName = "";
 
     if (clientType === 'web') {
-      // ReactJS - Only Admin allowed
-      allowedRoles = ['Admin'];
+      // ReactJS - Allow all roles for web application
+      allowedRoles = ['Admin', 'Tanod', 'Resident'];
       clientName = "web application";
     } else if (clientType === 'mobile') {
       // React Native - Only Tanod and Resident allowed
@@ -730,6 +730,54 @@ app.get("/api/incidents/:id", (req, res) => {
     }
     
     res.json(results[0]);
+  });
+});
+
+// API endpoint to delete an incident by ID
+app.delete("/api/incidents/:id", (req, res) => {
+  const incidentId = req.params.id;
+
+  if (!incidentId) {
+    return res.status(400).json({ success: false, message: "Incident ID is required" });
+  }
+
+  // First, get the incident to delete its image if it exists
+  const getIncidentSql = "SELECT image FROM incident_report WHERE id = ?";
+  db.query(getIncidentSql, [incidentId], (err, results) => {
+    if (err) {
+      console.error("❌ SQL error fetching incident for deletion:", err);
+      return res.status(500).json({ success: false, message: "Database error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: "Incident not found" });
+    }
+
+    const imageToDelete = results[0].image;
+
+    const deleteSql = "DELETE FROM incident_report WHERE id = ?";
+    db.query(deleteSql, [incidentId], (deleteErr, result) => {
+      if (deleteErr) {
+        console.error("❌ SQL error deleting incident:", deleteErr);
+        return res.status(500).json({ success: false, message: "Failed to delete incident" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Incident not found" });
+      }
+
+      // Delete the associated image file from the uploads folder
+      if (imageToDelete) {
+        const imagePath = path.join(__dirname, "uploads", imageToDelete);
+        fs.unlink(imagePath, (unlinkErr) => {
+          if (unlinkErr && unlinkErr.code !== 'ENOENT') {
+            console.error("Error deleting incident image file:", unlinkErr);
+          }
+        });
+      }
+
+      res.json({ success: true, message: "Incident deleted successfully" });
+    });
   });
 });
 

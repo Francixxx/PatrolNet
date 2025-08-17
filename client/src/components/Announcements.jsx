@@ -76,14 +76,14 @@ export default function AnnouncementPage() {
         <h2>Visual Announcements</h2>
         <div className="announcement-image-grid">
           {/* These images are static, consider making them dynamic if they are related to announcements */}
-          <img src="http://10.170.82.215:3001/uploads/Alert.png" alt="Announcement Image 1" />
-          <img src="http://10.170.82.215:3001/uploads/Alert2.jpg" alt="Announcement Image 2" />
-          <img src="http://10.170.82.215:3001/uploads/Alert3.jpg" alt="Announcement Image 3" />
-          <img src="http://10.170.82.215:3001/uploads/Medical.jpg" alt="Announcement Image 4" />
-          <img src="http://10.170.82.215:3001/uploads/patrol1.jpg" alt="Announcement Image 5" />
-          <img src="http://10.170.82.215:3001/uploads/patrol2.jpg" alt="Announcement Image 6" />
-          <img src="http://10.170.82.215:3001/uploads/patrol3.jpg" alt="Announcement Image 7" />
-          <img src="http://10.170.82.215:3001/uploads/slide.jpg" alt="Announcement Image 8" />
+          <img src="/Alert.png" alt="Announcement Image 1" />
+          <img src="Alert2.jpg" alt="Announcement Image 2" />
+          <img src="Alert3.jpg" alt="Announcement Image 3" />
+          <img src="Medical.jpg" alt="Announcement Image 4" />
+          <img src="slide1.jpg" alt="Announcement Image 5" />
+          <img src="slide2.jpg" alt="Announcement Image 6" />
+          <img src="slide3.jpg" alt="Announcement Image 7" />
+          <img src="/slide.jpg" alt="Announcement Image 8" />
         </div>
       </section>
 

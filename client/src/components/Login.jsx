@@ -35,15 +35,7 @@ const Login = ({ setShowLogin, onLoginSuccess }) => {
         const userRole = res.data.user?.role || res.data.user?.ROLE;
         
         // Check role based on selected login mode
-        if (isAdmin && userRole !== 'Admin') {
-          setMessage("Access denied. Only Admin users are allowed to login.");
-          setLoading(false);
-          return;
-        } else if (!isAdmin && userRole === 'Admin') {
-          setMessage("Please use Admin login for administrator accounts.");
-          setLoading(false);
-          return;
-        }
+        
 
         const userData = {
           username: username,

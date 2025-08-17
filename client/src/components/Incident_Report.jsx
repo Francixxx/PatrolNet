@@ -277,6 +277,7 @@ function IncidentReport() {
       })
       .catch(err => {
         console.error('Error deleting incident:', err);
+        console.error('Error details:', err.message, err.stack);
         alert('An error occurred while deleting the incident');
       })
       .finally(() => {
