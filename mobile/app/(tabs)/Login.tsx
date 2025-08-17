@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from "react-native";
+import * as Location from 'expo-location'; // Import expo-location
 
 
 type RootStackParamList = {
@@ -32,6 +33,70 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");  
   const [loading, setLoading] = useState(false);
 
+  const handleSosPress = async () => {
+    Alert.alert("Emergency SOS", "Initiating emergency access...");
+    
+    try {
+      // Request permissions
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Permission to access location was denied. Cannot send SOS.');
+        return;
+      }
+
+      // Get current location
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      // Perform reverse geocoding to get human-readable address
+      let address = 'Not Available';
+      try {
+        let geocode = await Location.reverseGeocodeAsync({
+          latitude,
+          longitude,
+        });
+        if (geocode && geocode.length > 0) {
+          const { street, streetNumber, city, region, country } = geocode[0];
+          address = `${streetNumber ? streetNumber + ' ' : ''}${street || ''}, ${city || ''}, ${region || ''}, ${country || ''}`.trim();
+          if (address === ", , ,") { // Fallback if all parts are empty
+            address = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
+          }
+        }
+      } catch (geocodeError) {
+        console.error('Reverse geocoding error:', geocodeError);
+        address = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`; // Fallback to coordinates
+      }
+
+      // Retrieve user data from AsyncStorage
+      const storedUserId = await AsyncStorage.getItem('userId');
+      const storedUsername = await AsyncStorage.getItem('username');
+
+      if (!storedUserId || !storedUsername) {
+        Alert.alert('Error', 'User data not found. Please log in again.');
+        return;
+      }
+
+      // Send SOS report to backend
+      const response = await axios.post("http://10.170.82.215:3001/sos-report", {
+        userId: storedUserId,
+        username: storedUsername,
+        latitude,
+        longitude,
+        location: address, // Send the human-readable address
+      });
+
+      if (response.data.success) {
+        Alert.alert('SOS Sent', 'Emergency report sent successfully to admin.');
+      } else {
+        Alert.alert('SOS Failed', response.data.message || 'Failed to send emergency report.');
+      }
+
+    } catch (error: any) {
+      console.error('SOS error:', error);
+      Alert.alert('SOS Error', 'Something went wrong while sending SOS. Please try again.');
+    }
+  };
+
   const handleLogin = async () => {
     if (!username || !password) {
       Alert.alert("Missing fields", "Please enter username and password");
@@ -40,7 +105,7 @@ const Login: React.FC = () => {
 
     setLoading(true);
     try {
-        const response = await axios.post("http://192.168.100.3:3001/login", {
+        const response = await axios.post("http://10.170.82.215:3001/login", {
           username,
           password,
           clientType: 'mobile' // Specify this is a mobile client request
@@ -155,7 +220,7 @@ return (
               value={username}
               onChangeText={setUsername}
               placeholder="Enter your username"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor="#ffffffff"
               autoCapitalize="none"
             />
           </View>
@@ -170,7 +235,7 @@ return (
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor="#ffffffff"
               secureTextEntry
             />
           </View>
@@ -195,11 +260,15 @@ return (
           )}
         </TouchableOpacity>
 
-        {/* Emergency Access */}
-        <TouchableOpacity style={styles.emergencyButton} activeOpacity={0.7}>
-          <Text style={styles.emergencyIcon}>🚨</Text>
-          <Text style={styles.emergencyText}>EMERGENCY ACCESS</Text>
+        {/* Emergency SOS Circle */}
+        <TouchableOpacity 
+          style={styles.sosCircle} 
+          onPress={handleSosPress}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.sosText}>SOS</Text>
         </TouchableOpacity>
+
 
         {/* Footer */}
         <View style={styles.footerSection}>
@@ -237,6 +306,29 @@ const styles = StyleSheet.create({
   flex: 1,
   backgroundColor: "#0F172A",
 },
+
+sosCircle: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  backgroundColor: "#DC2626",
+  justifyContent: "center",
+  alignItems: "center",
+  alignSelf: "center",
+  marginTop: 24,
+  shadowColor: "#DC2626",
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.6,
+  shadowRadius: 10,
+  elevation: 8,
+},
+sosText: {
+  fontSize: 15,
+  fontWeight: "900",
+  color: "#FFFFFF",
+  letterSpacing: 2,
+},
+
 
   loginContainer: {
     flex: 1,
@@ -349,7 +441,7 @@ const styles = StyleSheet.create({
   inputIcon: {
     fontSize: 18,
     marginRight: 12,
-    color: "#64748B",
+    color: "#ffffffff",
   },
   inputBox: {
     flex: 1,
@@ -430,7 +522,7 @@ const styles = StyleSheet.create({
   },
   footerLabel: {
     fontSize: 14,
-    color: "#64748B",
+    color: "#ffffffff",
     marginBottom: 8,
   },
   createAccountButton: {

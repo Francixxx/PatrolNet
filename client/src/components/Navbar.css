@@ -1,4 +1,6 @@
-/* User Avatar Dropdown Styles */
+.header{
+  background-color: red;
+}
 .user-avatar-container {
   position: relative;
   display: inline-block;
@@ -351,4 +353,9 @@
   }
   
   /* Form fields already stack vertically, so no changes needed for mobile */
+}
+
+/* Remove underline from navigation links */
+.ml-6.flex.space-x-8 a {
+  text-decoration: none;
 }

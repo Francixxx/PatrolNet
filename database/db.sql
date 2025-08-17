@@ -113,6 +113,20 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`ID`, `USER`, `PASSWORD`, `NAME`, `ADDRESS`, `ROLE`, `STATUS`, `IMAGE`, `EMAIL`, `push_token`) VALUES
 (1, 'admin', 'admin', 'John Doe', 'address@', 'Admin', 'Verified', '1748760269580-559878099.jpg', 'johndoe@gmail.com', NULL);
 
+
+--
+-- Table structure for table `activities`
+--
+
+CREATE TABLE `activities` (
+  `_id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `date` date NOT NULL,
+  `description` text NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -180,3 +194,17 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+--
+-- Table structure for table `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `date` DATE NOT NULL,
+  `description` TEXT NOT NULL,
+  `image` VARCHAR(255) DEFAULT NULL,
+  `posted_by` VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

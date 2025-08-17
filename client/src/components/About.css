@@ -1,12 +1,13 @@
 .about-section {
+  /* background-color: aliceblue; */
     max-width: 1200px;
     margin: 0 auto;
-    padding: 100px 10px;
+    padding: 0 40px;
   }
   
   .feature-block {
     display: flex;
-    margin-bottom: 80px;
+    margin-bottom: 100px;
     align-items: center;
     gap: 40px;
     opacity: 0;
@@ -38,7 +39,7 @@
   
   .feature-text p {
     font-size: 16px;
-    line-height: 1.5;
+    line-height: 1.6;
     color: #666;
   }
   
@@ -175,3 +176,330 @@
     width: 80%;
     max-width: 800px;
   }
+  .about-container {
+  padding: 2rem;
+  font-family: "Poppins", sans-serif;
+  background: #f4f6f8;
+  min-height: 100vh;
+}
+
+.about-header {
+  text-align: center;
+  /* margin-bottom: 4rem; */
+}
+
+.about-header h1 {
+  font-size: 2.5rem;
+  color: #1a73e8;
+}
+
+.about-header p {
+  font-size: 1.1rem;
+  color: #555;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.about-history h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1a73e8;
+}
+
+.history-section {
+  margin-top: 80px;
+}
+
+.timeline {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.timeline::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  background-color: #1a73e8;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  margin-left: -3px;
+}
+
+.timeline-item {
+  padding: 2rem 0;
+  position: relative;
+  width: 50%;
+}
+
+.timeline-item:nth-child(odd) {
+  left: 0;
+}
+
+.timeline-item:nth-child(even) {
+  left: 50%;
+}
+
+.timeline-date {
+  font-weight: bold;
+  color: #1a73e8;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-content h3 {
+  margin-top: 0;
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+  transform: translateX(-30px);
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+  transform: translateX(30px);
+}
+
+@media screen and (max-width: 768px) {
+  .timeline::after {
+    left: 20px;
+  }
+  .timeline-item {
+    width: 100%;
+    padding-left: 50px;
+    padding-right: 0;
+  }
+  .timeline-item:nth-child(even) {
+    left: 0;
+  }
+  .timeline-item:nth-child(odd) .timeline-content,
+  .timeline-item:nth-child(even) .timeline-content {
+    transform: translateX(0);
+  }
+}
+
+.about-footer {
+  background-color: #2c3e50;
+  color: #ecf0f0;
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.about-footer .footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about-footer p {
+  margin-bottom: 15px;
+}
+
+.about-footer .footer-links a {
+  color: #ecf0f1;
+  text-decoration: none;
+  margin: 0 15px;
+  transition: color 0.3s ease;
+}
+
+.about-footer .footer-links a:hover {
+  color: #3498db;
+}
+
+.about-footer .social-media {
+  margin-top: 20px;
+}
+
+.about-footer .social-media a {
+  color: #ecf0f1;
+  font-size: 1.5rem;
+  margin: 0 10px;
+  transition: color 0.3s ease;
+}
+
+.about-footer .social-media a:hover {
+  color: #3498db;
+}
+
+@media (max-width: 768px) {
+  .about-footer .footer-content {
+    flex-direction: column;
+  }
+
+  .about-footer .footer-links {
+    margin-bottom: 15px;
+  }
+}
+
+.about-header-background {
+  background-image: url('realqzonbg.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 300px; /* Adjust height as needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white; /* Ensure text is visible on the background */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for readability */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-top: 100px; /* Add padding to push content down */
+  margin-bottom: 4rem; /* Add margin to the bottom */
+}
+
+.about-header-background h1 {
+  color: white;
+}
+
+.about-header-background p {
+  color: white;
+}
+
+/* Download App Section */
+.download-app-section {
+  padding: 60px 40px;
+  text-align: center;
+  background-color: #f9f9f9;
+  margin-top: 80px;
+}
+
+.download-app-section h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.download-app-section p {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.download-btn {
+  display: inline-block;
+  padding: 15px 30px;
+  background-color: #1a73e8;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.download-btn:hover {
+  background-color: #155ab6;
+}
+
+/* Application Showcase Section */
+.application-showcase-section {
+  padding: 80px 40px;
+  text-align: center;
+  background-color: #f0f2f5;
+  margin-top: 80px;
+}
+
+.application-showcase-section h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.application-showcase-section p {
+  font-size: 1.2rem;
+  color: #555;
+  max-width: 800px;
+  margin: 0 auto 50px;
+}
+
+.showcase-images {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.showcase-image {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 300px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.showcase-image:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.showcase-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.image-caption {
+  padding: 20px;
+  text-align: left;
+}
+
+.image-caption h3 {
+  font-size: 1.4rem;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+.image-caption p {
+  font-size: 0.95rem;
+  color: #7f8c8d;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .application-showcase-section {
+    padding: 50px 20px;
+  }
+
+  .application-showcase-section h2 {
+    font-size: 2rem;
+  }
+
+  .application-showcase-section p {
+    font-size: 1rem;
+  }
+
+  .showcase-image {
+    width: 100%;
+  }
+}
+
+/* Section Separator */
+.section-separator {
+  height: 2px;
+  background-color: #e0e0e0;
+  margin: 80px auto;
+  width: 50%;
+  max-width: 600px;
+}
+
+
+

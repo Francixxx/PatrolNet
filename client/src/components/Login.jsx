@@ -9,6 +9,7 @@ const Login = ({ setShowLogin, onLoginSuccess }) => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true); // New state for login mode
 
   const handleLogin = async () => {
     setLoading(true);
@@ -20,10 +21,12 @@ const Login = ({ setShowLogin, onLoginSuccess }) => {
     }
 
     try {
-      const res = await axios.post("http://192.168.100.3:3001/login", {
+      const res = await axios.post("http://10.170.82.215:3001/login", {
         username,
         password,
         clientType: 'web'
+      }, {
+        timeout: 10000 // 10 seconds timeout
       });
 
       setMessage(res.data.message);
@@ -31,8 +34,13 @@ const Login = ({ setShowLogin, onLoginSuccess }) => {
       if (res.data.success) {
         const userRole = res.data.user?.role || res.data.user?.ROLE;
         
-        if (userRole !== 'Admin') {
+        // Check role based on selected login mode
+        if (isAdmin && userRole !== 'Admin') {
           setMessage("Access denied. Only Admin users are allowed to login.");
+          setLoading(false);
+          return;
+        } else if (!isAdmin && userRole === 'Admin') {
+          setMessage("Please use Admin login for administrator accounts.");
           setLoading(false);
           return;
         }
@@ -47,6 +55,10 @@ const Login = ({ setShowLogin, onLoginSuccess }) => {
           userStatus: res.data.user.status,
           userImage: res.data.user.image
         };
+
+        // Save role and login state in localStorage
+        localStorage.setItem("userRole", userRole);
+        localStorage.setItem("isLoggedIn", true);
 
         console.log('Login successful, user data:', userData);
         onLoginSuccess(userData);
@@ -73,18 +85,19 @@ const Login = ({ setShowLogin, onLoginSuccess }) => {
           <button className="back-button" onClick={() => setShowLogin(false)}>
             <FaArrowLeft />
           </button>
-          <h2>Admin Portal</h2>
+          <h2>{isAdmin ? "Admin Portal" : "User Portal"}</h2>
         </div>
-        
-          <div className="login-avatar">
+
+        <div className="login-avatar">
           <div className="avatar-circle">
             <img 
               src="/logo.jpg" 
-              alt="Admin Avatar" 
-              className="avatar-image"
+              alt={`${isAdmin ? "Admin" : "User"} Avatar`} 
+              className="avatar-image" 
             />
           </div>
         </div>
+
         <div className="input-group">
           <FaUser className="input-icon" />
           <input
@@ -138,6 +151,20 @@ const Login = ({ setShowLogin, onLoginSuccess }) => {
           </div>
         )}
 
+        <div className="login-footer">
+          <a 
+            href="#switch" 
+            className="forgot-password"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsAdmin(!isAdmin);
+              setMessage(""); // Clear any existing messages
+            }}
+          >
+            {isAdmin ? "User Login" : "Admin Login"}
+          </a>
+        </div>
+        
         <div className="login-footer">
           <a href="#forgot" className="forgot-password">Forgot password?</a>
         </div>

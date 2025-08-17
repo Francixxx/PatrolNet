@@ -42,6 +42,13 @@
 }
 
 .homepage-card p {
-  font-size: 1rem;
+  font-size: 0.9rem; /* Smaller font size for description */
   color: #666;
+}
+
+.count-number {
+  font-size: 1.8rem; /* Bigger font size for the count */
+  font-weight: bold;
+  margin-left: 0.5rem; /* Add some space between text and count */
+  color: #007bff; /* Example color for emphasis */
 }

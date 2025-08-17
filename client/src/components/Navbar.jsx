@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
-// Profile Modal Component (keeping the same as before)
+// 
 const UserProfileModal = ({ isOpen, onClose, userProfile, onSave }) => {
   const [formData, setFormData] = useState({
     image: '',
@@ -17,7 +17,7 @@ const UserProfileModal = ({ isOpen, onClose, userProfile, onSave }) => {
   useEffect(() => {
     if (userProfile) {
       setFormData({
-        image: userProfile.IMAGE ? `http://192.168.100.3:3001/uploads/${userProfile.IMAGE}` : '',
+        image: userProfile.IMAGE ? `http://10.170.82.215:3001/uploads/${userProfile.IMAGE}` : '',
         imageFile: null,
         fullName: userProfile.NAME || '',
         username: userProfile.USERNAME || localStorage.getItem('username') || '',
@@ -103,7 +103,7 @@ const UserProfileModal = ({ isOpen, onClose, userProfile, onSave }) => {
 
       console.log('FormData to send:', Array.from(formDataToSend.entries()));
 
-      const response = await fetch(`http://192.168.100.3:3001/api/user/${username}`, {
+      const response = await fetch(`http://10.170.82.215:3001/api/user/${username}`, {
         method: 'PUT',
         body: formDataToSend,
       });
@@ -292,18 +292,23 @@ const Navbar = ({ currentUser }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [newIncidentCount, setNewIncidentCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false); // New loading state
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Alert system state and refs
   const previousIncidentsCountRef = useRef(0);
   const isInitialLoadRef = useRef(true);
 
   const navigationItems = [
+    { path: '/dashboard', label: 'Dashboard' },
     { path: '/incident-report', label: 'Incident Report' },
     { path: '/scheduling', label: 'Scheduling & Assessment' },
     { path: '/gis-mapping', label: 'GIS Mapping' },
     { path: '/patrol-logs', label: 'Patrol Logs' },
+    { path: '/activities', label: 'Activities' }, // New item
     { path: '/accounts', label: 'Accounts' },
+    { path: '/admin-announcements', label: 'Announcements' }, 
   ];
 
   // Emergency alert sound function - CENTRALIZED HERE
@@ -384,7 +389,7 @@ const Navbar = ({ currentUser }) => {
     }
 
     const monitorIncidents = () => {
-      fetch("http://192.168.100.3:3001/api/incidents")
+      fetch("http://10.170.82.215:3001/api/incidents")
         .then(res => res.json())
         .then(data => {
           const currentCount = data.length;
@@ -447,7 +452,7 @@ const Navbar = ({ currentUser }) => {
     
     if (username) {
       try {
-        const url = `http://192.168.100.3:3001/api/user/${username}`;
+        const url = `http://10.170.82.215:3001/api/user/${username}`;
         console.log('Fetching from URL:', url);
         
         const response = await fetch(url);
@@ -499,14 +504,10 @@ const Navbar = ({ currentUser }) => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('username');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userImage');
+    setIsLoading(true); // Set loading to true
     localStorage.clear();
-    
-    window.location.href = '/login';
+    navigate('/'); // Redirect to landing page
+    setIsLoading(false); // Set loading to false after navigation
     setShowProfileDropdown(false);
   };
 
@@ -527,20 +528,26 @@ const Navbar = ({ currentUser }) => {
     const storedImage = localStorage.getItem('userImage');
     if (storedImage && storedImage.trim() !== '') {
       console.log('Using stored image:', storedImage);
-      return `http://192.168.100.3:3001/uploads/${storedImage}`;
+      return `http://10.170.82.215:3001/uploads/${storedImage}`;
     }
     
     if (userProfile && userProfile.IMAGE && userProfile.IMAGE.trim() !== '') {
       console.log('Using profile image:', userProfile.IMAGE);
-      return `http://192.168.100.3:3001/uploads/${userProfile.IMAGE}`;
+      return `http://10.170.82.215:3001/uploads/${userProfile.IMAGE}`;
     }
     
     console.log('No user image found, using placeholder');
-    return "https://via.placeholder.com/32";
+    return "/defprof1.png";
   };
 
   return (
     <>
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <p>Logging out...</p>
+        </div>
+      )}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -581,48 +588,7 @@ const Navbar = ({ currentUser }) => {
                   </span>
                 </div>
               )}
-              
-              <div className="user-avatar-container">
-                <div className="avatar-wrapper" onClick={toggleProfileDropdown}>
-                  <img
-                    className="avatar-image"
-                    src={getAvatarSrc()}
-                    alt="User avatar"
-                    onError={(e) => {
-                      console.log('Image failed to load, using placeholder');
-                      e.target.src = "https://via.placeholder.com/32";
-                    }}
-                  />
-                  <div className="online-indicator"></div>
-                </div>
-
-                {showProfileDropdown && (
-                  <div className="user-dropdown">
-                    <div className="dropdown-header">
-                      <div className="user-info">
-                        <div className="user-name">
-                          {userProfile?.NAME || currentUser?.username || localStorage.getItem('username') || 'User'}
-                        </div>
-                        <div className="user-role">
-                          {userProfile?.ROLE || currentUser?.role || localStorage.getItem('userRole') || 'Current User'}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="dropdown-divider"></div>
-                    <button className="dropdown-item" onClick={handleProfileClick}>
-                      <span className="dropdown-icon">👤</span>
-                      Profile
-                    </button>
-                    <button 
-                      className="dropdown-item logout-item" 
-                      onClick={handleLogout}
-                    >
-                      <span className="dropdown-icon">🚪</span>
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
+        
             </div>
           </div>
         </div>

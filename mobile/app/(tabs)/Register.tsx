@@ -90,7 +90,7 @@ const Register: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://192.168.100.3:3001/register", {
+      const response = await axios.post("http://10.170.82.215:3001/register", {
         username,
         password,
         role,
@@ -143,7 +143,7 @@ return (
                 value={name}
                 onChangeText={setName}
                 placeholder="Enter your complete legal name"
-                placeholderTextColor="#64748B"
+                placeholderTextColor="#ffffffff"
               />
             </View>
           </View>
@@ -157,7 +157,7 @@ return (
                 value={username}
                 onChangeText={setUsername}
                 placeholder="Choose unique identifier"
-                placeholderTextColor="#64748B"
+                placeholderTextColor="#ffffffff"
                 autoCapitalize="none"
               />
             </View>
@@ -172,7 +172,7 @@ return (
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Create strong password"
-                placeholderTextColor="#64748B"
+                placeholderTextColor="#ffffffff"
                 secureTextEntry
               />
             </View>
@@ -187,7 +187,7 @@ return (
                 value={email}
                 onChangeText={setEmail}
                 placeholder="official.email@domain.com"
-                placeholderTextColor="#64748B"
+                placeholderTextColor="#ffffffff"
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
@@ -204,7 +204,7 @@ return (
                   value={address}
                   onChangeText={setAddress}
                   placeholder="Enter service area or use GPS location"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor="#ffffffff"
                   multiline={true}
                   numberOfLines={2}
                 />
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
   inputIcon: {
     fontSize: 16,
     marginRight: 10,
-    color: "#64748B",
+    color: "#ffffffff",
   },
   inputBox: {
     flex: 1,
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   pickerIcon: {
     fontSize: 16,
     marginRight: 10,
-    color: "#64748B",
+    color: "#ffffffff",
   },
   picker: {
     flex: 1,
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 13,
-    color: "#64748B",
+    color: "#ffffffff",
     marginBottom: 8,
   },
   backButton: {

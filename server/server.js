@@ -57,39 +57,47 @@ function getGMT8Time() {
 
 // Updated Login route with client-based role restrictions
 app.post("/login", (req, res) => {
+  console.log("Login attempt received.");
   const { username, password, clientType } = req.body;
 
   if (!username || !password) {
+    console.log("Missing username or password.");
     return res.status(400).json({ error: "Username and password are required" });
   }
 
   // Validate clientType parameter
   if (!clientType || !['web', 'mobile'].includes(clientType)) {
+    console.log("Invalid clientType.");
     return res.status(400).json({ 
       error: "Client type is required and must be 'web' or 'mobile'" 
     });
   }
 
+  console.log(`Attempting login for user: ${username}, clientType: ${clientType}`);
   const sql = "SELECT * FROM users WHERE USER = ? AND PASSWORD = ?";
   db.query(sql, [username, password], (err, results) => {
     if (err) {
-      console.error("❌ SQL error:", err);
+      console.error("❌ SQL error during login:", err);
       return res.status(500).json({ error: "Database error" });
     }
 
     if (results.length === 0) {
+      console.log("Invalid username or password.");
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
     const user = results[0];
+    console.log(`User found: ${user.USER}, Role: ${user.ROLE}, Status: ${user.STATUS}`);
 
     // Check if user status allows login
     if (user.STATUS !== "Verified") {
       if (user.STATUS === "Pending") {
+        console.log("Account pending verification.");
         return res.status(403).json({ 
           error: "Account status is Pending. Please verify your account." 
         });
       } else {
+        console.log(`Account status "${user.STATUS}" does not allow login.`);
         return res.status(403).json({ 
           error: `Account status "${user.STATUS}" does not allow login.` 
         });
@@ -112,11 +120,13 @@ app.post("/login", (req, res) => {
 
     // Check if user role is allowed for this client
     if (!allowedRoles.includes(user.ROLE)) {
+      console.log(`Access denied for role ${user.ROLE} on ${clientName}.`);
       return res.status(403).json({ 
         error: `Access denied. Only ${allowedRoles.join(' and ')} users are allowed to access the ${clientName}.` 
       });
     }
 
+    console.log("Login successful.");
     // Return success with user data (excluding password for security)
     return res.json({ 
       success: true, 
@@ -132,6 +142,32 @@ app.post("/login", (req, res) => {
         image: user.IMAGE
       }
     });
+  });
+});
+
+// SOS Report endpoint
+app.post("/sos-report", (req, res) => {
+  const { userId, username, latitude, longitude, location } = req.body;
+
+  if (!userId || !username || !latitude || !longitude || !location) {
+    return res.status(400).json({ success: false, message: "Missing required SOS data" });
+  }
+
+  const currentTime = getGMT8Time();
+  const incidentType = "SOS";
+  const status = "New"; // Or "Emergency"
+
+  const sql = `
+    INSERT INTO incident_report (incident_type, latitude, longitude, datetime, reported_by, status, location)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [incidentType, latitude, longitude, currentTime, username, status, location], (err, result) => {
+    if (err) {
+      console.error("❌ SQL error inserting SOS report:", err);
+      return res.status(500).json({ success: false, message: "Database error while saving SOS report" });
+    }
+    res.json({ success: true, message: "SOS report received and saved", id: result.insertId });
   });
 });
 
@@ -1420,6 +1456,319 @@ app.post("/api/time-record", async (req, res) => {
       message: "Database error" 
     });
   }
+});
+
+// API endpoint to fetch all activities
+app.get("/api/activities", (req, res) => {
+  const sql = "SELECT * FROM activities ORDER BY date DESC";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("❌ SQL error fetching activities:", err);
+      return res.status(500).json({ error: "Failed to fetch activities" });
+    }
+    res.json(results);
+  });
+});
+
+// API endpoint to add a new activity
+app.post("/api/activities", upload.single("image"), (req, res) => {
+  const { title, date, description } = req.body;
+  const image = req.file ? req.file.filename : null;
+
+  if (!title || !date || !description) {
+    return res.status(400).json({ success: false, message: "Title, date, and description are required" });
+  }
+
+  const sql = "INSERT INTO activities (title, date, description, image) VALUES (?, ?, ?, ?)";
+  db.query(sql, [title, date, description, image], (err, result) => {
+    if (err) {
+      console.error("❌ SQL error adding activity:", err);
+      return res.status(500).json({ success: false, message: "Failed to add activity" });
+    }
+    res.json({ success: true, message: "Activity added successfully", id: result.insertId });
+  });
+});
+
+// API endpoint to update an activity by ID
+app.put("/api/activities/:id", upload.single("image"), (req, res) => {
+  const activityId = req.params.id;
+  const { title, date, description } = req.body;
+  const image = req.file ? req.file.filename : null;
+
+  if (!activityId) {
+    return res.status(400).json({ success: false, message: "Activity ID is required" });
+  }
+
+  // First, get the current activity data to check for existing image
+  const getActivitySql = "SELECT image FROM activities WHERE _id = ?";
+  db.query(getActivitySql, [activityId], (err, results) => {
+    if (err) {
+      console.error("❌ SQL error fetching activity for update:", err);
+      return res.status(500).json({ success: false, message: "Database error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: "Activity not found" });
+    }
+
+    const currentImage = results[0].image;
+
+    let sql = "UPDATE activities SET ";
+    let params = [];
+    let updateFields = [];
+
+    if (title) {
+      updateFields.push("title = ?");
+      params.push(title);
+    }
+    if (date) {
+      updateFields.push("date = ?");
+      params.push(date);
+    }
+    if (description) {
+      updateFields.push("description = ?");
+      params.push(description);
+    }
+    if (image) {
+      updateFields.push("image = ?");
+      params.push(image);
+      // Delete old image if a new one is uploaded and an old one exists
+      if (currentImage) {
+        const oldImagePath = path.join(__dirname, "uploads", currentImage);
+        fs.unlink(oldImagePath, (unlinkErr) => {
+          if (unlinkErr && unlinkErr.code !== 'ENOENT') {
+            console.error("Error deleting old activity image:", unlinkErr);
+          }
+        });
+      }
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ success: false, message: "No fields to update" });
+    }
+
+    sql += updateFields.join(", ");
+    sql += " WHERE _id = ?";
+    params.push(activityId);
+
+    db.query(sql, params, (updateErr, result) => {
+      if (updateErr) {
+        console.error("❌ SQL error updating activity:", updateErr);
+        return res.status(500).json({ success: false, message: "Failed to update activity" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Activity not found or no changes made" });
+      }
+
+      res.json({ success: true, message: "Activity updated successfully" });
+    });
+  });
+});
+
+// API endpoint to delete an activity by ID
+app.delete("/api/activities/:id", (req, res) => {
+  const activityId = req.params.id;
+
+  if (!activityId) {
+    return res.status(400).json({ success: false, message: "Activity ID is required" });
+  }
+
+  // First, get the activity to delete its image if it exists
+  const getActivitySql = "SELECT image FROM activities WHERE _id = ?";
+  db.query(getActivitySql, [activityId], (err, results) => {
+    if (err) {
+      console.error("❌ SQL error fetching activity for deletion:", err);
+      return res.status(500).json({ success: false, message: "Database error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: "Activity not found" });
+    }
+
+    const imageToDelete = results[0].image;
+
+    const deleteSql = "DELETE FROM activities WHERE _id = ?";
+    db.query(deleteSql, [activityId], (deleteErr, result) => {
+      if (deleteErr) {
+        console.error("❌ SQL error deleting activity:", deleteErr);
+        return res.status(500).json({ success: false, message: "Failed to delete activity" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Activity not found" });
+      }
+
+      // Delete the associated image file from the uploads folder
+      if (imageToDelete) {
+        const imagePath = path.join(__dirname, "uploads", imageToDelete);
+        fs.unlink(imagePath, (unlinkErr) => {
+          if (unlinkErr && unlinkErr.code !== 'ENOENT') {
+            console.error("Error deleting activity image file:", unlinkErr);
+          }
+        });
+      }
+
+      res.json({ success: true, message: "Activity deleted successfully" });
+    });
+  });
+});
+
+// API endpoint to fetch all announcements
+app.get("/api/announcements", (req, res) => {
+  const sql = "SELECT * FROM announcements ORDER BY date DESC";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("❌ SQL error fetching announcements:", err);
+      return res.status(500).json({ error: "Failed to fetch announcements" });
+    }
+    res.json(results);
+  });
+});
+
+// API endpoint to add a new announcement
+app.post("/api/announcements", upload.single("image"), (req, res) => {
+  const { title, description, posted_by } = req.body;
+  const image = req.file ? req.file.filename : null; // Get filename if image was uploaded
+  const date = getGMT8Time(); // Use the helper function for GMT+8 time
+
+  if (!title || !description || !posted_by) {
+    return res.status(400).json({ success: false, message: "Title, description, and posted_by are required" });
+  }
+
+  const sql = "INSERT INTO announcements (title, date, description, image, posted_by) VALUES (?, ?, ?, ?, ?)";
+  db.query(sql, [title, date, description, image, posted_by], (err, result) => {
+    if (err) {
+      console.error("❌ SQL error adding announcement:", err);
+      return res.status(500).json({ success: false, message: "Failed to add announcement" });
+    }
+    res.json({ success: true, message: "Announcement added successfully", id: result.insertId });
+  });
+});
+
+// API endpoint to update an announcement by ID
+app.put("/api/announcements/:id", upload.single("image"), (req, res) => {
+  const announcementId = req.params.id;
+  const { title, description, posted_by } = req.body;
+  const image = req.file ? req.file.filename : null;
+
+  if (!announcementId) {
+    return res.status(400).json({ success: false, message: "Announcement ID is required" });
+  }
+
+  // First, get the current announcement data to check for existing image
+  const getAnnouncementSql = "SELECT image FROM announcements WHERE _id = ?";
+  db.query(getAnnouncementSql, [announcementId], (err, results) => {
+    if (err) {
+      console.error("❌ SQL error fetching announcement for update:", err);
+      return res.status(500).json({ success: false, message: "Database error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: "Announcement not found" });
+    }
+
+    const currentImage = results[0].image;
+
+    let sql = "UPDATE announcements SET ";
+    let params = [];
+    let updateFields = [];
+
+    if (title) {
+      updateFields.push("title = ?");
+      params.push(title);
+    }
+    if (description) {
+      updateFields.push("description = ?");
+      params.push(description);
+    }
+    if (posted_by) {
+      updateFields.push("posted_by = ?");
+      params.push(posted_by);
+    }
+    if (image) {
+      updateFields.push("image = ?");
+      params.push(image);
+      // Delete old image if a new one is uploaded and an old one exists
+      if (currentImage) {
+        const oldImagePath = path.join(__dirname, "uploads", currentImage);
+        fs.unlink(oldImagePath, (unlinkErr) => {
+          if (unlinkErr && unlinkErr.code !== 'ENOENT') {
+            console.error("Error deleting old announcement image:", unlinkErr);
+          }
+        });
+      }
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ success: false, message: "No fields to update" });
+    }
+
+    sql += updateFields.join(", ");
+    sql += " WHERE _id = ?";
+    params.push(announcementId);
+
+    db.query(sql, params, (updateErr, result) => {
+      if (updateErr) {
+        console.error("❌ SQL error updating announcement:", updateErr);
+        return res.status(500).json({ success: false, message: "Failed to update announcement" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Announcement not found or no changes made" });
+      }
+
+      res.json({ success: true, message: "Announcement updated successfully" });
+    });
+  });
+});
+
+// API endpoint to delete an announcement by ID
+app.delete("/api/announcements/:id", (req, res) => {
+  const announcementId = req.params.id;
+
+  if (!announcementId) {
+    return res.status(400).json({ success: false, message: "Announcement ID is required" });
+  }
+
+  // First, get the announcement to delete its image if it exists
+  const getAnnouncementSql = "SELECT image FROM announcements WHERE _id = ?";
+  db.query(getAnnouncementSql, [announcementId], (err, results) => {
+    if (err) {
+      console.error("❌ SQL error fetching announcement for deletion:", err);
+      return res.status(500).json({ success: false, message: "Database error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: "Announcement not found" });
+    }
+
+    const imageToDelete = results[0].image;
+
+    const deleteSql = "DELETE FROM announcements WHERE _id = ?";
+    db.query(deleteSql, [announcementId], (deleteErr, result) => {
+      if (deleteErr) {
+        console.error("❌ SQL error deleting announcement:", deleteErr);
+        return res.status(500).json({ success: false, message: "Failed to delete announcement" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Announcement not found" });
+      }
+
+      // Delete the associated image file from the uploads folder
+      if (imageToDelete) {
+        const imagePath = path.join(__dirname, "uploads", imageToDelete);
+        fs.unlink(imagePath, (unlinkErr) => {
+          if (unlinkErr && unlinkErr.code !== 'ENOENT') {
+            console.error("Error deleting announcement image file:", unlinkErr);
+          }
+        });
+      }
+
+      res.json({ success: true, message: "Announcement deleted successfully" });
+    });
+  });
 });
 
 // Add this API endpoint to your backend (paste.txt)

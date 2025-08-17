@@ -33,7 +33,7 @@ const createCustomIcon = (incidentType) => {
   });
 };
 
-function GISMapping() {
+function GISMapping({ showOnlyMap }) {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,7 +46,7 @@ function GISMapping() {
   const fetchIncidents = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://192.168.100.3:3001/api/incidents');
+      const response = await fetch('http://10.170.82.215:3001/api/incidents');
       
       if (!response.ok) {
         throw new Error('Failed to fetch incidents');
@@ -96,48 +96,51 @@ function GISMapping() {
 
   return (
     <div className="dashboard-container">
-      {/* Replace the hardcoded header with the Navbar component */}
-      <Navbar />
+      {!showOnlyMap && <Navbar />}
 
       <div className="gis-mapping-wrapper">
-        <div className="gis-header">
-          <h2>📍 Incident Mapping System</h2>
-          <p>Interactive map showing all reported incidents with their locations</p>
-          <div className="map-stats">
-            <span className="stat-item">
-              Total Incidents: <strong>{incidents.length}</strong>
-            </span>
-            <button onClick={fetchIncidents} className="refresh-btn">
-              🔄 Refresh Data
-            </button>
+        {!showOnlyMap && (
+          <div className="gis-header">
+            <h2>📍 Incident Mapping System</h2>
+            <p>Interactive map showing all reported incidents with their locations</p>
+            <div className="map-stats">
+              <span className="stat-item">
+                Total Incidents: <strong>{incidents.length}</strong>
+              </span>
+              <button onClick={fetchIncidents} className="refresh-btn">
+                🔄 Refresh Data
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="map-legend">
-          <h4>Legend:</h4>
-          <div className="legend-items">
-            <div className="legend-item">
-              <div className="legend-color" style={{backgroundColor: '#ff4444'}}></div>
-              <span>Fire</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{backgroundColor: '#ff8800'}}></div>
-              <span>Accident</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{backgroundColor: '#8800ff'}}></div>
-              <span>Crime</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{backgroundColor: '#ff0088'}}></div>
-              <span>Emergency</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{backgroundColor: '#0088ff'}}></div>
-              <span>Other</span>
+        {!showOnlyMap && (
+          <div className="map-legend">
+            <h4>Legend:</h4>
+            <div className="legend-items">
+              <div className="legend-item">
+                <div className="legend-color" style={{backgroundColor: '#ff4444'}}></div>
+                <span>Fire</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-color" style={{backgroundColor: '#ff8800'}}></div>
+                <span>Accident</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-color" style={{backgroundColor: '#8800ff'}}></div>
+                <span>Crime</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-color" style={{backgroundColor: '#ff0088'}}></div>
+                <span>Emergency</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-color" style={{backgroundColor: '#0088ff'}}></div>
+                <span>Other</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="map-container">
           {loading ? (
@@ -156,7 +159,7 @@ function GISMapping() {
             <MapContainer
               center={mapCenter}
               zoom={13}
-              style={{ height: '600px', width: '100%' }}
+              style={{ height: showOnlyMap ? '400px' : '600px', width: '100%' }}
               className="leaflet-map"
             >
               <TileLayer
@@ -197,7 +200,7 @@ function GISMapping() {
                         {incident.image && (
                           <div className="popup-image">
                             <img 
-                              src={`http://192.168.100.3:3001/uploads/${incident.image}`}
+                              src={`http://10.170.82.215:3001/uploads/${incident.image}`}
                               alt="Incident"
                               style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover' }}
                             />
